@@ -57,82 +57,19 @@ By the end of this report, we will have shown ...
 ## \<\<Data Set 1\>\>
 
 ```{r load_data1}
-# Put in your code to load in the data set, along with any
-# necessary cleaning beyond what was done in Part 1
 
-# Since we interested in data during year 2020,
-# we filter the ice_extent dataset so that it only contains data related to 2020
-# so that we can work with it later on with covid 2020 dataset
-# compare the 2 dataset with months
-covid_2020_original <- read_parquet("covid_2020_original.parquet")
-ice_extent_daily_original <- read_parquet("ice_extent_daily.parquet")
+# hurricane
 cyclones_data_original <- read_parquet("cyclones_data.parquet")
 
-#variable.names(cyclones_data_original)
+# facet by year
+# x = categories
+# y = frequencies (how many times each categories of hurricane happens in that year)
+cyclone_category_frequency_from_2015_to_2022 <- cyclones_data_original |>
+  filter(ObservYear >= 2015 & ObservYear <= 2022) |>
+  ggplot(aes(x = category)) +
+  geom_bar()
 
-# Find the average / sum of the hurricane max_wind per year?
-# Basin: the region that cyclone happens...
-cyclones_data <- cyclones_data_original |> 
-  group_by(Basin, ObservYear) |>
-  mutate(AvgMaxWindPerYear = mean(max_wind, na.rm = TRUE)) |>
-  select(Basin, ObservYear, AvgMaxWindPerYear) |>
-  distinct() 
-
-# First graph, colour by basin
-# Result: Normal periodic change across the years
-cyclones_data |>
-  ggplot() +
-    aes(x = ObservYear, y = AvgMaxWindPerYear, colour = Basin) +
-    geom_point() +
-    geom_line() +
-    #geom_smooth(se = FALSE, method = "lm", formula = y ~ x) +
-    xlim(2010, 2022)
-
-cyclones_data_original
-
-# Did covid impact different region? (for feasibility) (one of the aspect that we think)
-
-# Possible Result: We look into the possibility of covid impact hurricanes for different region differently? We look at the graph by faceting, it is actually not. Maybe COVID19 is not the factor of hurricane change.
-cyclones_data_original |>
-  group_by(Basin, ObservYear) |>
-  mutate(AvgMaxWindPerYear = mean(max_wind, na.rm = TRUE)) |>
-  select(Basin, ObservYear, AvgMaxWindPerYear, category) |>
-  distinct() |>
-  ggplot() +
-    aes(x = ObservYear, y = AvgMaxWindPerYear) +
-    geom_point() +
-    geom_line() +
-    #geom_smooth(se = FALSE, method = "lm", formula = y ~ x) +
-    xlim(2018, 2022) +
-    facet_wrap(~ Basin, scales = "free") 
-
-# Later: do find the result in a 3 months interval...
-
-
-
-
-
-
-
-# Ice melt across year 2010 to 2024?
-ice_extent_daily_original |>
-  filter(year >= 2010) |>
-  group_by(year, region) |>
-  summarise(total_ice_melt = sum(ice_extent)) |>
-  ggplot() +
-    aes(x = year, y = total_ice_melt, colour = region) +
-    geom_line() 
-
-
-# Ice melt across year 2018 to 2024?
-ice_extent_daily_original |>
-  filter(year >= 2018) |>
-  group_by(year, region) |>
-  summarise(total_ice_melt = sum(ice_extent)) |>
-  ggplot() +
-    aes(x = year, y = total_ice_melt, colour = region) +
-    geom_line()
-
+cyclone_category_frequency_from_2015_to_2022
 ```
 
 The data come from \<<place>\> and describe \<<more specific description of the data>\>.
@@ -142,11 +79,15 @@ In order to clean the data, we \<\<steps to clean the data, concise but precise 
 ## \<\<Data Set 2\>\>
 
 ```{r load_data2}
+# hurricane with facet
+
 # Put in your code to load in the data set, along with any
 # necessary cleaning beyond what was done in Part 1
 
 # Reminder: do not print your data to the screen unless it's
 # completely necessary
+
+cyclone_category_frequency_from_2015_to_2022 + facet_wrap(~ObservYear)
 ```
 
 The data come from \<<place>\> and detail \<<more specific description of the data>\>.
@@ -156,8 +97,18 @@ In order to clean the data, we \<\<steps to clean the data, concise but precise 
 ## \<\<Data Set 3\>\>
 
 ```{r load_data2}
-# Put in your code to load in the data set, along with any
-# necessary cleaning beyond what was done in Part 1
+# covid19 and ice extent
+covid_2020_original <- read_parquet("covid_2020_original.parquet")
+ice_extent_daily_original <- read_parquet("ice_extent_daily.parquet")
+
+# Ice melt across year 2018 to 2024?
+ice_extent_daily_original |>
+  filter(year >= 2018) |>
+  group_by(year, region) |>
+  summarise(total_ice_melt = sum(ice_extent)) |>
+  ggplot() +
+    aes(x = year, y = total_ice_melt, colour = region) +
+    geom_line()
 ```
 
 The data come from \<<place>\> and detail \<<more specific description of the data>\>.

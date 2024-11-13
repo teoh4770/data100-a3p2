@@ -54,27 +54,35 @@ By the end of this report, we will have shown ...
 
 # Data Description
 
-## \<\<Data Set 1\>\>
+## \<\<cyclones_data\>\>
 
 ```{r load_data1}
 
-# hurricane
-cyclones_data_original <- read_parquet("cyclones_data.parquet")
-
-# facet by year
-# x = categories
-# y = frequencies (how many times each categories of hurricane happens in that year)
-cyclone_category_frequency_from_2015_to_2022 <- cyclones_data_original |>
-  filter(ObservYear >= 2015 & ObservYear <= 2022) |>
-  ggplot(aes(x = category)) +
-  geom_bar()
-
-cyclone_category_frequency_from_2015_to_2022
+cyclones_data <- cyclones_data_original |> 
+  group_by(Basin, ObservYear) |>
+  mutate(AvgMaxWindPerYear = mean(max_wind, na.rm = TRUE)) |>
+  select(Basin, ObservYear, AvgMaxWindPerYear) |>
+  distinct() 
+# First graph, colour by basin
+# Result: Normal periodic change across the years
+cyclones_data |>
+  filter(Basin != "CP")|>
+  ggplot() +
+    aes(x = ObservYear, y = AvgMaxWindPerYear, colour = Basin) +
+    geom_point() +
+    geom_smooth(se = FALSE, method = 'loess', formula = 'y ~ x') +
+    xlim(1990, 2022)
 ```
 
-The data come from \<<place>\> and describe \<<more specific description of the data>\>.
+The data come from \<<cyclones_data>\> and describe The trend for different areas seems having complete opposite slope and it is not quite obvious to see a change between 2019 to 2023(starting and end time for COVID) for individual locations. If COVID reduce the temperature of Earth due to less human activity, there should be a difference in trend compare to the last 10 years. This shows that there is no significant effect interms of hurricane speed.
 
-In order to clean the data, we \<\<steps to clean the data, concise but precise enough that a reader could follow your steps without seeing your code\>\>.
+<https://www.c2es.org/content/hurricanes-and-climate-change/>
+
+<https://wmo.int/news/media-centre/climate-change-indicators-and-impacts-worsened-2020>
+
+In order to clean the data, we -\>
+
+1.  
 
 ## \<\<Data Set 2\>\>
 
@@ -86,11 +94,21 @@ In order to clean the data, we \<\<steps to clean the data, concise but precise 
 
 # Reminder: do not print your data to the screen unless it's
 # completely necessary
+# hurricane
+cyclones_data_original <- read_parquet("cyclones_data.parquet")
 
-cyclone_category_frequency_from_2015_to_2022 + facet_wrap(~ObservYear)
+# facet by year
+# x = categories
+# y = frequencies (how many times each categories of hurricane happens in that year)
+cyclone_category_frequency_from_2015_to_2022 <- cyclones_data_original |>
+  filter(ObservYear >= 2014 & ObservYear <= 2022) |>
+  ggplot(aes(x = category)) +
+  geom_bar() + 
+  facet_wrap(~ObservYear)
+cyclone_category_frequency_from_2015_to_2022
 ```
 
-The data come from \<<place>\> and detail \<<more specific description of the data>\>.
+The data come from \<<cyclones_data_original>\> and it is use the analyse the category of hurricanes. Across from different graphs for years, all of them keeps a right skewed trend. Looking into the years(2019 to 2022) when COVID is present, The number of stronger Hurricanes are appearing less then the years before. This could be an effect of COVID
 
 In order to clean the data, we \<\<steps to clean the data, concise but precise enough that a reader could follow your steps without seeing your code\>\>
 
@@ -123,13 +141,13 @@ Explain how any combinations of data were performed. Explain what kind of join w
 
 To achieve our goals, we explored the data by
 
-1.  iceburg and covid 19 -\> interest: iceburg tends to melt down less because of less human activity due to covid 19
+1.  Hurricanes plots over time -\> Making Hurricane plots to see if there are changes during COVID time.
 
-2.  happiness and covid 19 -\> interest: covid 19, isolation makes people sad of course, but we also think that there might be an extreme at the very end (there's people that's actually happy) **(edited)**
+2.  Hurricane category facet by time -\> If there is a significant change when COVID tend change.
 
-    These are the dataset we gonna use: iceburg, covid-19, happiness
+3.  Ice melting speed vs the number of cases in COVID -\> covid 19, isolation makes people sad of course, but we also think that there might be an extreme at the very end (there's people that's actually happy)
 
-We explored many aspects of the data, but will demonstrate three. These are \<\<insight 1\>\>, \<\<insight 2\>\>, and \<<insight3>\>
+    These are the dataset we gonna use: Hurricane, covid-19, Ice_extent
 
 The first aspect that we found interesting is shown in \@ref(fig:insight1). The insight should be specific to the data shown, not a general statement beyond the data (leave that for the conclusion).
 
@@ -139,6 +157,19 @@ The first aspect that we found interesting is shown in \@ref(fig:insight1). The 
 # \@ref(fig:insight1), where "insight1" is the label of this code
 # chunk (the first bit of text after the "r" in "```{r label, options...}")
 
+
+# hurricane
+cyclones_data_original <- read_parquet("cyclones_data.parquet")
+
+# facet by year
+# x = categories
+# y = frequencies (how many times each categories of hurricane happens in that year)
+cyclone_category_frequency_from_2015_to_2022 <- cyclones_data_original |>
+  filter(ObservYear >= 2015 & ObservYear <= 2022) |>
+  ggplot(aes(x = category)) +
+  geom_bar()
+
+cyclone_category_frequency_from_2015_to_2022
 # iceburg and covid 19
 
 ```
@@ -151,6 +182,7 @@ This insight is supported by the summary statistics in table \@ref(tab:summary_s
 # is convenient for making nice tables. Other packages can
 # do much fancier things with tables, but keep in mind that
 # the insights should be the star, not the formatting.
+
 ```
 
 The next insight that we found is shown in \@ref(fig:insight2).
@@ -159,11 +191,24 @@ The next insight that we found is shown in \@ref(fig:insight2).
 # This figure will have a height of 4 and a width of 6.
 # Feel free to change this, and to apply different sizes
 # to the other figures you create.
+cyclone_category_frequency_from_2015_to_2022 + facet_wrap(~ObservYear)
 ```
 
 Finally, \@ref(fig:insight3) shows ...
 
 ```{r insight3, fig.height=4, fig.width=6, fig.cap="This is a figure caption that you will need to change in order to get good marks in the visualization rubric items."}
+# covid19 and ice extent
+covid_2020_original <- read_parquet("covid_2020_original.parquet")
+ice_extent_daily_original <- read_parquet("ice_extent_daily.parquet")
+
+# Ice melt across year 2018 to 2024?
+ice_extent_daily_original |>
+  filter(year >= 2018) |>
+  group_by(year, region) |>
+  summarise(total_ice_melt = sum(ice_extent)) |>
+  ggplot() +
+    aes(x = year, y = total_ice_melt, colour = region) +
+    geom_line()
 ```
 
 # Conclusion and Future Work

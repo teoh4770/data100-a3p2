@@ -26,6 +26,8 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE, fig.width = 6)
 # DO NOT PUT "install.packages()" IN AN RMD FILE!!!
 library(tidyverse)
 library(arrow)
+library(patchwork)
+library(ggExtra)
 ```
 
 # Instructions
@@ -61,14 +63,6 @@ By the end of this report, we will have shown ...
 # hurricane
 cyclones_data_original <- read_parquet("cyclones_data.parquet")
 
-# facet by year
-# x = categories
-# y = frequencies (how many times each categories of hurricane happens in that year)
-cyclone_category_frequency_from_2015_to_2022 <- cyclones_data_original |>
-  filter(ObservYear >= 2015 & ObservYear <= 2022) |>
-  ggplot(aes(x = category)) +
-  geom_bar()
-
 cyclones_data <- cyclones_data_original |> 
   group_by(Basin, ObservYear) |>
   mutate(AvgMaxWindPerYear = mean(max_wind, na.rm = TRUE)) |>
@@ -76,16 +70,13 @@ cyclones_data <- cyclones_data_original |>
   distinct() 
 # First graph, colour by basin
 # Result: Normal periodic change across the years
-cyclones_data |>
-  ggplot() +
-    aes(x = ObservYear, y = AvgMaxWindPerYear, colour = Basin) +
-    geom_point() +
-    geom_line() +
-    #geom_smooth(se = FALSE, method = "lm", formula = y ~ x) +
-    xlim(2010, 2022)
-
-
-cyclone_category_frequency_from_2015_to_2022
+#cyclones_data |>
+#  ggplot() +
+#    aes(x = ObservYear, y = AvgMaxWindPerYear, colour = Basin) +
+#    geom_point() +
+#    geom_line() +
+#    #geom_smooth(se = FALSE, method = "lm", formula = y ~ x) +
+#    xlim(2010, 2022)
 ```
 
 The data come from \<<place>\> and describe \<<more specific description of the data>\>.
@@ -103,7 +94,7 @@ In order to clean the data, we \<\<steps to clean the data, concise but precise 
 # Reminder: do not print your data to the screen unless it's
 # completely necessary
 
-cyclone_category_frequency_from_2015_to_2022 + facet_wrap(~ObservYear)
+#cyclone_category_frequency_from_2015_to_2022 + facet_wrap(~ObservYear)
 ```
 
 The data come from \<<place>\> and detail \<<more specific description of the data>\>.
@@ -143,6 +134,35 @@ covid_2020_ice_extent <- ice_extent_daily |>
     by = join_by(date)
   ) 
 
+# We interest in the sudden spike of stringency index overall
+# measure of restriction and lockdown: https://ourworldindata.org/covid-stringency-index
+# The stringency index typically measures the strictness of government policies and interventions during the COVID-19 pandemic, such as lockdowns, travel bans, and restrictions on businesses and social gatherings. A higher value indicates stricter measures, while a lower value indicates more relaxed or fewer restrictions.
+monthly_ice_extent_and_stringency <- covid_2020_ice_extent |>
+  pivot_longer(
+    cols = c(Antarctic, Arctic),
+    names_to = "region",
+    values_to = "ice_extent"
+  ) |>
+  group_by(year, month) |>
+  mutate(
+    stringency_index_monthly_avg = mean(stringency_index, na.rm = TRUE),
+    average_ice_melt = mean(ice_extent, na.rm = TRUE)
+  ) |>
+  ungroup()
+
+# correlation
+monthly_ice_extent_and_stringency |>
+  summarise(
+    correlation = round(cor(
+      stringency_index_monthly_avg, 
+      average_ice_melt, 
+      use = "complete.obs"
+    ) , 3),
+    .groups = "drop" # This suppresses an annoying message
+  ) 
+
+
+# Finding: An increase in the average stringency index associates with very little or no increase of average ice extent.
 ```
 
 The data come from \<<place>\> and detail \<<more specific description of the data>\>.
@@ -156,12 +176,6 @@ Explain how any combinations of data were performed. Explain what kind of join w
 # Exploratory Data Analysis
 
 To achieve our goals, we explored the data by
-
-1.  iceburg and covid 19 -\> interest: iceburg tends to melt down less because of less human activity due to covid 19
-
-2.  happiness and covid 19 -\> interest: covid 19, isolation makes people sad of course, but we also think that there might be an extreme at the very end (there's people that's actually happy) **(edited)**
-
-    These are the dataset we gonna use: iceburg, covid-19, happiness
 
 We explored many aspects of the data, but will demonstrate three. These are \<\<insight 1\>\>, \<\<insight 2\>\>, and \<<insight3>\>
 
@@ -181,7 +195,7 @@ cyclones_data |>
     xlim(1990, 2022)
 ```
 
-The data come from \<\<cyclones_data\>\> and describe The trend for different areas seems having complete opposite slope and it is not quite obvious to see a change between 2019 to 2023(starting and end time for COVID) for individual locations. If COVID reduce the temperature of Earth due to less human activity, there should be a difference in trend compare to the last 10 years. This shows that there is no significant effect interms of hurricane speed.
+The data come from \<\<cyclones_data\>\> and describe the trend for different areas seems having complete opposite slope and it is not quite obvious to see a change between 2019 to 2023(starting and end time for COVID) for individual locations. If COVID reduce the temperature of Earth due to less human activity, there should be a difference in trend compare to the last 10 years. This shows that there is no significant effect interms of hurricane speed.
 
 <https://www.c2es.org/content/hurricanes-and-climate-change/>
 
@@ -208,7 +222,6 @@ The next insight that we found is shown in \@ref(fig:insight2).
 # Reminder: do not print your data to the screen unless it's
 # completely necessary
 # hurricane
-cyclones_data_original <- read_parquet("cyclones_data.parquet")
 
 # facet by year
 # x = categories
@@ -225,80 +238,86 @@ The data come from \<\<cyclones_data_original\>\> and it is use the analyse the 
 
 Finally, \@ref(fig:insight3) shows ...
 
-```{r insight3, fig.height=4, fig.width=6, fig.cap="This is a figure caption that you will need to change in order to get good marks in the visualization rubric items."}
-# we interest in the sudden spike of stringency index overall
-# measure of restriction and lockdown: https://ourworldindata.org/covid-stringency-index
-# The stringency index typically measures the strictness of government policies and interventions during the COVID-19 pandemic, such as lockdowns, travel bans, and restrictions on businesses and social gatherings. A higher value indicates stricter measures, while a lower value indicates more relaxed or fewer restrictions.
-stringency_index_graph <- covid_2020_ice_extent |>
-  group_by(month, year) |>
-  mutate(stringency_index_monthly_avg = mean(stringency_index, na.rm = TRUE)) |>
-  ggplot() +
-    aes(x = date, y = stringency_index_monthly_avg) +
-    geom_area( fill="#69b3a2", alpha=0.4) + 
-    geom_line(color="black", linewidth=0.5) +
-    labs(
-      title="Stringency Index Changes Across Years", 
-      subtitle="The higher the index, the stricter of government policies and interventions during Covid-19 pandemic."
-    )
+```{r insight3, fig.height=5, fig.width=7, fig.cap="This is a figure caption that you will need to change in order to get good marks in the visualization rubric items."}
 
-stringency_index_graph
+# Note: Please pick between one of the graph below:
+# 1. Normalized Ice Extent and COVID-19 Stringency Index (2016-2023)
+# 2. Correlation between Monthly Average Ice Extent\n and COVID-19 Stringency Index over time
 
+# 1. Comparison graph between ice extent and stringency index
+# Pros: Different plot type, can see more comparison together
+# Cons: Complex than the correlation graph(2), harder to understand the effect
+range_y_stringency_index <- max(monthly_ice_extent_and_stringency$stringency_index, na.rm = TRUE) - min(monthly_ice_extent_and_stringency$stringency_index, na.rm = TRUE)
+range_y_avg_ice_melt <- max(monthly_ice_extent_and_stringency$average_ice_melt, na.rm = TRUE) - min(monthly_ice_extent_and_stringency$average_ice_melt, na.rm = TRUE)
 
-# monthly average ice extent since 2020
-monthly_avg_ice_extent <- covid_2020_ice_extent |>
-  pivot_longer(
-    cols = c(Antarctic, Arctic),
-    names_to = "region",
-    values_to = "ice_extent"
-  ) |>
-  filter(year >= 2020) |>
-  group_by(year, month) |>
-  mutate(average_ice_melt = mean(ice_extent, na.rm = TRUE)) |>
-  ggplot() +
-    aes(x = date, y = average_ice_melt) +
-    geom_line(color="black", linewidth=0.5) +
-    labs(title = "Monthly Average Ice Extent Over Time",
-           x = "Date",
-           y = "Ice Extent",
-           color = "Region") 
-
-monthly_avg_ice_extent
-
-#plotting ice extent and new cases over time (final graph we wanna plot)
-covid_2020_ice_extent <- covid_2020_ice_extent |>
-  pivot_longer(
-    cols = c(Antarctic, Arctic),
-    names_to = "region",
-    values_to = "ice_extent"
-  ) |>
-  group_by(year, month) |>
-  mutate(
-    stringency_index_monthly_avg = mean(stringency_index, na.rm = TRUE),
-    average_ice_melt = mean(ice_extent, na.rm = TRUE) 
-  ) 
-    
-
-# define teh scale factor for plotting 2 dataset with different y-axis ranges on a dual-axis plot, you can base it on the ranges (maximum and minimum values) of each y-axis variable. Here’s a simple approach:
-# 1. Find the Range of Each y-Axis Variable
-# 2. Define the Scaling Factor
-range_y_stringency_index <- max(covid_2020_ice_extent$stringency_index, na.rm = TRUE) - min(covid_2020_ice_extent$stringency_index, na.rm = TRUE)
-range_y_avg_ice_melt <- max(covid_2020_ice_extent$average_ice_melt, na.rm = TRUE) - min(covid_2020_ice_extent$average_ice_melt, na.rm = TRUE)
-
- min(covid_2020_ice_extent$average_ice_melt, na.rm = TRUE)
-
-# Define the scaling factor
 scaling_factor <- range_y_stringency_index / range_y_avg_ice_melt
-# scale <- a / b, 
-# a / scale
 
-# now stringency index is larger than avg ice melt, we try to make stringency_index smaller for easy plotting
-covid_2020_ice_extent |>
-  filter(year > 2015) |>
+year_lines <- seq.Date(
+  from = as.Date("2016-01-01"), # change start date based on your data
+  to = as.Date("2024-01-01"),   # change end date based on your data
+  by = "year"
+)
+
+
+monthly_ice_extent_and_stringency |>
+  mutate(
+    # Normalize ice extent data to a 0-1 scale
+    normalized_ice_extent = (
+      average_ice_melt - min(average_ice_melt, na.rm = TRUE)
+    ) / (
+      max(average_ice_melt, na.rm = TRUE) - min(average_ice_melt, na.rm = TRUE)
+    ),
+    
+    # Normalize COVID-19 stringency index to a 0-1 scale
+    normalized_stringency_index = stringency_index_monthly_avg / 100
+  ) |>
   ggplot() +
   aes(x = date) +
-  geom_line(aes(y = stringency_index_monthly_avg / scaling_factor), color="black", linewidth=0.5) +
-  geom_area(aes(y = stringency_index_monthly_avg / scaling_factor), fill="#69b3a2", alpha=0.4) +
-  geom_line(aes(y = average_ice_melt - 8.044393), color="blue", linewidth=0.5) 
+  geom_area(aes(y = normalized_stringency_index), fill="#69b3a2", alpha=0.4) +
+  geom_line(aes(y = normalized_stringency_index, color = "COVID-19 Stringency Index"), linewidth=0.5) +
+  geom_line(aes(y = normalized_ice_extent, color="Ice Extent"), linewidth=0.5) +
+  geom_vline(xintercept = as.numeric(year_lines), color = "black", linetype = "dashed", alpha=0.4) +
+  scale_x_date(
+    limits = as.Date(c("2016-01-01","2023-01-01")),
+    date_breaks = "1 years",
+    date_labels = "%Y (%b)",
+  ) +
+  labs(
+    title="Normalized Ice Extent and COVID-19 Stringency Index (2016-2023)",
+    subtitle = "Monthly trends, both scaled to 0-1 to observe potential correlations",
+    x = NULL,
+    y = "Standardized Ice Extent and Stringency Index (0-1)"
+    
+  ) +
+  scale_color_manual(
+    name = "Legend",                       
+    values = c("Ice Extent" = "blue",     
+               "COVID-19 Stringency Index" = "black") 
+  ) +
+  theme_grey() +
+  theme(legend.position = "top")
+
+
+# 2. Correlation graph
+# Pros: Simple, and clear for our purposes.
+# Cons: Repeated plot type, which might no be accepted
+cor_value <- cor(monthly_ice_extent_and_stringency$stringency_index_monthly_avg, 
+                 monthly_ice_extent_and_stringency$average_ice_melt, 
+                 use = "complete.obs") 
+
+p <- ggplot(monthly_ice_extent_and_stringency, aes(x = stringency_index_monthly_avg, y = average_ice_melt)) +
+  geom_point(alpha = 0.6) +  
+  geom_smooth(method = "lm", se = FALSE) + 
+  labs(
+    title = "Correlation between Monthly Average Ice Extent\n and COVID-19 Stringency Index over time",
+    subtitle = str_c("Correlation Coefficient: ", round(cor_value, 3)),
+    x = "COVID-19 Stringency Index",
+    y = "Average Ice Extent (unit)"
+  ) +
+  theme_minimal() 
+
+# Add a boxplot to the scatter plot
+ggMarginal(p, type = "boxplot")
 ```
 
 # Conclusion and Future Work

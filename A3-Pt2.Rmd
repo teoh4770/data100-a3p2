@@ -54,9 +54,20 @@ By the end of this report, we will have shown ...
 
 # Data Description
 
-## \<\<cyclones_data\>\>
+## \<\<Data Set 1\>\>
 
 ```{r load_data1}
+
+# hurricane
+cyclones_data_original <- read_parquet("cyclones_data.parquet")
+
+# facet by year
+# x = categories
+# y = frequencies (how many times each categories of hurricane happens in that year)
+cyclone_category_frequency_from_2015_to_2022 <- cyclones_data_original |>
+  filter(ObservYear >= 2015 & ObservYear <= 2022) |>
+  ggplot(aes(x = category)) +
+  geom_bar()
 
 cyclones_data <- cyclones_data_original |> 
   group_by(Basin, ObservYear) |>
@@ -66,6 +77,102 @@ cyclones_data <- cyclones_data_original |>
 # First graph, colour by basin
 # Result: Normal periodic change across the years
 cyclones_data |>
+  ggplot() +
+    aes(x = ObservYear, y = AvgMaxWindPerYear, colour = Basin) +
+    geom_point() +
+    geom_line() +
+    #geom_smooth(se = FALSE, method = "lm", formula = y ~ x) +
+    xlim(2010, 2022)
+
+
+cyclone_category_frequency_from_2015_to_2022
+```
+
+The data come from \<<place>\> and describe \<<more specific description of the data>\>.
+
+In order to clean the data, we \<\<steps to clean the data, concise but precise enough that a reader could follow your steps without seeing your code\>\>.
+
+## \<\<Data Set 2\>\>
+
+```{r load_data2}
+# hurricane with facet
+
+# Put in your code to load in the data set, along with any
+# necessary cleaning beyond what was done in Part 1
+
+# Reminder: do not print your data to the screen unless it's
+# completely necessary
+
+cyclone_category_frequency_from_2015_to_2022 + facet_wrap(~ObservYear)
+```
+
+The data come from \<<place>\> and detail \<<more specific description of the data>\>.
+
+In order to clean the data, we \<\<steps to clean the data, concise but precise enough that a reader could follow your steps without seeing your code\>\>
+
+## \<\<Data Set 3\>\>
+
+```{r load_data2}
+# we interested in the relationship between covid19 and the effect of ice extent ice extent
+# covid19 and ice extent
+# covid19 human activities related variables: new_cases, new_deaths,
+# ice_extent: date, region, ice_extent
+covid_2020_original <- read_parquet("covid_2020_original.parquet")
+ice_extent_daily_original <- read_parquet("ice_extent_daily.parquet")
+
+covid_2020 <- covid_2020_original |>
+  select(
+    "date", 
+    "total_cases", 
+    "total_cases_per_million", 
+    "new_cases",
+    "new_cases_per_million", 
+    "stringency_index",
+  )
+
+ice_extent_daily <- ice_extent_daily_original |>
+  pivot_wider(
+    names_from = region,
+    values_from = ice_extent
+  )
+
+# Joined both covid_2020 and ice_extent_daily together by date
+covid_2020_ice_extent <- ice_extent_daily |> 
+  left_join(
+    covid_2020,
+    by = join_by(date)
+  ) 
+
+```
+
+The data come from \<<place>\> and detail \<<more specific description of the data>\>.
+
+In order to clean the data, we \<\<steps to clean the data, concise but precise enough that a reader could follow your steps without seeing your code\>\>
+
+## Combining the Data
+
+Explain how any combinations of data were performed. Explain what kind of join was needed, whether columns had to be modified (for example, matching "country" names.)
+
+# Exploratory Data Analysis
+
+To achieve our goals, we explored the data by
+
+1.  iceburg and covid 19 -\> interest: iceburg tends to melt down less because of less human activity due to covid 19
+
+2.  happiness and covid 19 -\> interest: covid 19, isolation makes people sad of course, but we also think that there might be an extreme at the very end (there's people that's actually happy) **(edited)**
+
+    These are the dataset we gonna use: iceburg, covid-19, happiness
+
+We explored many aspects of the data, but will demonstrate three. These are \<\<insight 1\>\>, \<\<insight 2\>\>, and \<<insight3>\>
+
+The first aspect that we found interesting is shown in \@ref(fig:insight1). The insight should be specific to the data shown, not a general statement beyond the data (leave that for the conclusion).
+
+```{r insight1, fig.cap="This is a figure caption that you will need to change in order to get good marks in the visualization rubric items."}
+# This is an example of how you can control figures and captions in
+# an R chunk. Note that you can reference figures using:
+# \@ref(fig:insight1), where "insight1" is the label of this code
+# chunk (the first bit of text after the "r" in "```{r label, options...}")
+cyclones_data |>
   filter(Basin != "CP")|>
   ggplot() +
     aes(x = ObservYear, y = AvgMaxWindPerYear, colour = Basin) +
@@ -74,19 +181,25 @@ cyclones_data |>
     xlim(1990, 2022)
 ```
 
-The data come from \<<cyclones_data>\> and describe The trend for different areas seems having complete opposite slope and it is not quite obvious to see a change between 2019 to 2023(starting and end time for COVID) for individual locations. If COVID reduce the temperature of Earth due to less human activity, there should be a difference in trend compare to the last 10 years. This shows that there is no significant effect interms of hurricane speed.
+The data come from \<\<cyclones_data\>\> and describe The trend for different areas seems having complete opposite slope and it is not quite obvious to see a change between 2019 to 2023(starting and end time for COVID) for individual locations. If COVID reduce the temperature of Earth due to less human activity, there should be a difference in trend compare to the last 10 years. This shows that there is no significant effect interms of hurricane speed.
 
 <https://www.c2es.org/content/hurricanes-and-climate-change/>
 
 <https://wmo.int/news/media-centre/climate-change-indicators-and-impacts-worsened-2020>
 
-In order to clean the data, we -\>
+This insight is supported by the summary statistics in table \@ref(tab:summary_stats)
 
-1.  
+```{r summary_stats}
 
-## \<\<Data Set 2\>\>
+```
 
-```{r load_data2}
+The next insight that we found is shown in \@ref(fig:insight2).
+
+```{r insight2, fig.height=4, fig.width=6, fig.cap="This is a figure caption that you will need to change in order to get good marks in the visualization rubric items."}
+# This figure will have a height of 4 and a width of 6.
+# Feel free to change this, and to apply different sizes
+# to the other figures you create.
+
 # hurricane with facet
 
 # Put in your code to load in the data set, along with any
@@ -108,107 +221,84 @@ cyclone_category_frequency_from_2015_to_2022 <- cyclones_data_original |>
 cyclone_category_frequency_from_2015_to_2022
 ```
 
-The data come from \<<cyclones_data_original>\> and it is use the analyse the category of hurricanes. Across from different graphs for years, all of them keeps a right skewed trend. Looking into the years(2019 to 2022) when COVID is present, The number of stronger Hurricanes are appearing less then the years before. This could be an effect of COVID
-
-In order to clean the data, we \<\<steps to clean the data, concise but precise enough that a reader could follow your steps without seeing your code\>\>
-
-## \<\<Data Set 3\>\>
-
-```{r load_data2}
-# covid19 and ice extent
-covid_2020_original <- read_parquet("covid_2020_original.parquet")
-ice_extent_daily_original <- read_parquet("ice_extent_daily.parquet")
-
-# Ice melt across year 2018 to 2024?
-ice_extent_daily_original |>
-  filter(year >= 2018) |>
-  group_by(year, region) |>
-  summarise(total_ice_melt = sum(ice_extent)) |>
-  ggplot() +
-    aes(x = year, y = total_ice_melt, colour = region) +
-    geom_line()
-```
-
-The data come from \<<place>\> and detail \<<more specific description of the data>\>.
-
-In order to clean the data, we \<\<steps to clean the data, concise but precise enough that a reader could follow your steps without seeing your code\>\>
-
-## Combining the Data
-
-Explain how any combinations of data were performed. Explain what kind of join was needed, whether columns had to be modified (for example, matching "country" names.)
-
-# Exploratory Data Analysis
-
-To achieve our goals, we explored the data by
-
-1.  Hurricanes plots over time -\> Making Hurricane plots to see if there are changes during COVID time.
-
-2.  Hurricane category facet by time -\> If there is a significant change when COVID tend change.
-
-3.  Ice melting speed vs the number of cases in COVID -\> covid 19, isolation makes people sad of course, but we also think that there might be an extreme at the very end (there's people that's actually happy)
-
-    These are the dataset we gonna use: Hurricane, covid-19, Ice_extent
-
-The first aspect that we found interesting is shown in \@ref(fig:insight1). The insight should be specific to the data shown, not a general statement beyond the data (leave that for the conclusion).
-
-```{r insight1, fig.cap="This is a figure caption that you will need to change in order to get good marks in the visualization rubric items."}
-# This is an example of how you can control figures and captions in
-# an R chunk. Note that you can reference figures using:
-# \@ref(fig:insight1), where "insight1" is the label of this code
-# chunk (the first bit of text after the "r" in "```{r label, options...}")
-
-
-# hurricane
-cyclones_data_original <- read_parquet("cyclones_data.parquet")
-
-# facet by year
-# x = categories
-# y = frequencies (how many times each categories of hurricane happens in that year)
-cyclone_category_frequency_from_2015_to_2022 <- cyclones_data_original |>
-  filter(ObservYear >= 2015 & ObservYear <= 2022) |>
-  ggplot(aes(x = category)) +
-  geom_bar()
-
-cyclone_category_frequency_from_2015_to_2022
-# iceburg and covid 19
-
-```
-
-This insight is supported by the summary statistics in table \@ref(tab:summary_stats)
-
-```{r summary_stats}
-# Calculate the relevant summary statistics here.
-# Note that the "kable" function in the "knitr" package
-# is convenient for making nice tables. Other packages can
-# do much fancier things with tables, but keep in mind that
-# the insights should be the star, not the formatting.
-
-```
-
-The next insight that we found is shown in \@ref(fig:insight2).
-
-```{r insight2, fig.height=4, fig.width=6, fig.cap="This is a figure caption that you will need to change in order to get good marks in the visualization rubric items."}
-# This figure will have a height of 4 and a width of 6.
-# Feel free to change this, and to apply different sizes
-# to the other figures you create.
-cyclone_category_frequency_from_2015_to_2022 + facet_wrap(~ObservYear)
-```
+The data come from \<\<cyclones_data_original\>\> and it is use the analyse the category of hurricanes. Across from different graphs for years, all of them keeps a right skewed trend. Looking into the years(2019 to 2022) when COVID is present, The number of stronger Hurricanes are appearing less then the years before. This could be an effect of COVID
 
 Finally, \@ref(fig:insight3) shows ...
 
 ```{r insight3, fig.height=4, fig.width=6, fig.cap="This is a figure caption that you will need to change in order to get good marks in the visualization rubric items."}
-# covid19 and ice extent
-covid_2020_original <- read_parquet("covid_2020_original.parquet")
-ice_extent_daily_original <- read_parquet("ice_extent_daily.parquet")
-
-# Ice melt across year 2018 to 2024?
-ice_extent_daily_original |>
-  filter(year >= 2018) |>
-  group_by(year, region) |>
-  summarise(total_ice_melt = sum(ice_extent)) |>
+# we interest in the sudden spike of stringency index overall
+# measure of restriction and lockdown: https://ourworldindata.org/covid-stringency-index
+# The stringency index typically measures the strictness of government policies and interventions during the COVID-19 pandemic, such as lockdowns, travel bans, and restrictions on businesses and social gatherings. A higher value indicates stricter measures, while a lower value indicates more relaxed or fewer restrictions.
+stringency_index_graph <- covid_2020_ice_extent |>
+  group_by(month, year) |>
+  mutate(stringency_index_monthly_avg = mean(stringency_index, na.rm = TRUE)) |>
   ggplot() +
-    aes(x = year, y = total_ice_melt, colour = region) +
-    geom_line()
+    aes(x = date, y = stringency_index_monthly_avg) +
+    geom_area( fill="#69b3a2", alpha=0.4) + 
+    geom_line(color="black", linewidth=0.5) +
+    labs(
+      title="Stringency Index Changes Across Years", 
+      subtitle="The higher the index, the stricter of government policies and interventions during Covid-19 pandemic."
+    )
+
+stringency_index_graph
+
+
+# monthly average ice extent since 2020
+monthly_avg_ice_extent <- covid_2020_ice_extent |>
+  pivot_longer(
+    cols = c(Antarctic, Arctic),
+    names_to = "region",
+    values_to = "ice_extent"
+  ) |>
+  filter(year >= 2020) |>
+  group_by(year, month) |>
+  mutate(average_ice_melt = mean(ice_extent, na.rm = TRUE)) |>
+  ggplot() +
+    aes(x = date, y = average_ice_melt) +
+    geom_line(color="black", linewidth=0.5) +
+    labs(title = "Monthly Average Ice Extent Over Time",
+           x = "Date",
+           y = "Ice Extent",
+           color = "Region") 
+
+monthly_avg_ice_extent
+
+#plotting ice extent and new cases over time (final graph we wanna plot)
+covid_2020_ice_extent <- covid_2020_ice_extent |>
+  pivot_longer(
+    cols = c(Antarctic, Arctic),
+    names_to = "region",
+    values_to = "ice_extent"
+  ) |>
+  group_by(year, month) |>
+  mutate(
+    stringency_index_monthly_avg = mean(stringency_index, na.rm = TRUE),
+    average_ice_melt = mean(ice_extent, na.rm = TRUE) 
+  ) 
+    
+
+# define teh scale factor for plotting 2 dataset with different y-axis ranges on a dual-axis plot, you can base it on the ranges (maximum and minimum values) of each y-axis variable. Here’s a simple approach:
+# 1. Find the Range of Each y-Axis Variable
+# 2. Define the Scaling Factor
+range_y_stringency_index <- max(covid_2020_ice_extent$stringency_index, na.rm = TRUE) - min(covid_2020_ice_extent$stringency_index, na.rm = TRUE)
+range_y_avg_ice_melt <- max(covid_2020_ice_extent$average_ice_melt, na.rm = TRUE) - min(covid_2020_ice_extent$average_ice_melt, na.rm = TRUE)
+
+ min(covid_2020_ice_extent$average_ice_melt, na.rm = TRUE)
+
+# Define the scaling factor
+scaling_factor <- range_y_stringency_index / range_y_avg_ice_melt
+# scale <- a / b, 
+# a / scale
+
+# now stringency index is larger than avg ice melt, we try to make stringency_index smaller for easy plotting
+covid_2020_ice_extent |>
+  filter(year > 2015) |>
+  ggplot() +
+  aes(x = date) +
+  geom_line(aes(y = stringency_index_monthly_avg / scaling_factor), color="black", linewidth=0.5) +
+  geom_area(aes(y = stringency_index_monthly_avg / scaling_factor), fill="#69b3a2", alpha=0.4) +
+  geom_line(aes(y = average_ice_melt - 8.044393), color="blue", linewidth=0.5) 
 ```
 
 # Conclusion and Future Work

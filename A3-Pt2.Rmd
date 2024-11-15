@@ -13,7 +13,7 @@ List your group members, including their student numbers, here:
 -   David Zhao (169101599)
 -   Chee Kian Teoh (210984770)
 -   Harsahib Grewal (169089650)
--   (169046829)
+-   Oluoma (169046829)
 
 ```{r setup, include=FALSE}
 # echo = FALSE will set the Rmd to *not* show the R code. Don't change this.
@@ -31,6 +31,8 @@ library(ggExtra)
 # Abstract
 
 We are interested in exploring how COVID-19 have impacted climate change [^1] by analyzing three datasets: `covid_2020_original.parquet` (COVID), `ice_extent_daily.parquet` (Ice Extent), and `cyclones_data.parquet` (Hurricane). To examine relationships among these datasets, we conduct statistical analyses (summary statistic) and implement data visualization (plotting graphs) to identify trends and possible correlations. Surprisingly, our findings indicate that COVID-19 did not alleviate climate conditions.
+
+[^1]: This article leads us to investigate the impact of COVID19 towards climate change. Climate change indicators and impacts worsened in 2020: World Meteorological Organization, published on April. 19, 2021, URL: <https://wmo.int/news/media-centre/climate-change-indicators-and-impacts-worsened-2020>
 
 # Introduction
 
@@ -132,9 +134,9 @@ In order to clean the data, we:
 
 For the combination of the ice_extent dataset and covid_2020 dataset we were interested in combining both tables by their "date" column so we can analyze and see the correlation between the melting ice and COVID-19 stringency index (a measurement of how strict government policies were throughout the COVID-19 pandemic).
 
-To achieve the combination we used "left_join"[^1] to combine the ice_extent dataset into the COVID_2020 dataset. The reasoning behind choosing to combine with a left_join is because the ice_extent dataset has a wider range of data collected going from 1980 to 2023 whereas covid_2020 only had data from 2020 to 2024. Because of this we wanted to combine according to the same year while showing data from previous year in the ice_extent dataset to reflect if there is a correlation between the two.
+To achieve the combination we used "left_join"[^2] to combine the ice_extent dataset into the COVID_2020 dataset. The reasoning behind choosing to combine with a left_join is because the ice_extent dataset has a wider range of data collected going from 1980 to 2023 whereas covid_2020 only had data from 2020 to 2024. Because of this we wanted to combine according to the same year while showing data from previous year in the ice_extent dataset to reflect if there is a correlation between the two.
 
-[^1]: Learn about the concept of left join, right join and inner join. From "Joining data frames with dplyr", url: <https://lindsaydbrin.github.io/CREATE_R_Workshop/Lesson_-_dplyr_join.html>
+[^2]: This article leads us to investigate the impact of COVID19 towards climate change. Climate change indicators and impacts worsened in 2020: World Meteorological Organization, published on April. 19, 2021, URL: <https://wmo.int/news/media-centre/climate-change-indicators-and-impacts-worsened-2020>
 
 # Exploratory Data Analysis
 
@@ -157,7 +159,7 @@ cyclones_data |>
     labs(x = "Observe Year", y = "Average Max Wind (knots)", title = "Hurricane Average Max Wind for Both Atlantic And Eastern Pacific", subtitle = "From 1990 To 2022")
 ```
 
-The data come from \<\<cyclones_data\>\> and describe the trend for Atlantic and Eastern Pacific from 1990 to 2022. They seem having complete opposite slope and it is not quite obvious to see a change between 2019 to 2023 (starting and end time for COVID) for individual locations. Additionally, A big factor on speed and the frequency of spearing is heavily dependent on the current temperature. If COVID indeed reduces the temperature of Earth due to less human activity, there should be a difference in trend compare to the last 10 years. This shows that there is no significant effect in terms of hurricane speed.
+The data is from \<\<cyclones_data\>\> and describes the trend for different areas. It has a complete opposite slope and it is not quite obvious to see a change between 2019 to 2023(starting and end time for COVID) for individual locations. Additionally, a big factor on speed and the frequecy of occurring is heavily dependent on the current temperature. If COVID reduces the temperature of Earth due to less human activity, there should be a difference in trend compare to the last 10 years. This shows that there is no significant effect in terms of hurricane speed.
 
 This insight is supported by the summary statistics in table \@ref(tab:summary_stats)
 
@@ -231,7 +233,7 @@ p
 
 ```
 
-The summary statistic is the correlation coefficient between the COVID-19 stringency index (a measurement of how strict government policies were throughout the COVID-19 pandemic) and the average ice melting area(km\^2) every month. This correlation is very weak. We can conclude that there is not correlation between the two variables. However, this might be caused by other factors. Maybe the effect from lock down would not occur immediately. To find out, lets make some plots according to time and analyse the trend.
+The summary statistic is the correlation coefficient between the strictness scale from law enforcement and the average ice melting area(km\^2) every month. This correlation is very weak. We can conclude that there is little to no correlation between the two variables. However, this might be caused by other factors. Maybe the effect from lockdown procedures would not occur immediately. To find out, let\'s make some plots according to time and analyze the trend.
 
 The next insight that we found is shown in \@ref(fig:insight2).
 
@@ -258,7 +260,7 @@ cyclone_category_frequency_from_2015_to_2022 <- cyclones_data_original |>
 cyclone_category_frequency_from_2015_to_2022
 ```
 
-The data come from \<\<cyclones_data_original\>\> and it is use the analyse the category of hurricanes. Across from different graphs for years, all of them keeps a right skewed trend. Looking into the years(2019 to 2022) when COVID is present, The number of stronger Hurricanes are appearing less then the years before. This could be an effect of COVID. However, this also could be other factors in the world because in the previous year there are also similar changes.
+The data comes from \<\<cyclones_data_original\>\> and it is uses the analyse the category of hurricanes. Across different graphs for years, all of them keep a right skewed trend. Looking into the years (2019 to 2022) when COVID is present, The number of stronger hurricanes appear less than the years before. This could be an effect of COVID. However, this also could be other factors in the world because in the previous year there are also similar changes.
 
 Finally, \@ref(fig:insight3) shows ...
 
@@ -332,7 +334,9 @@ Overall, we found \<<COVID-19 did not have significant drawback on global warmin
 
 We found that COVID did not change the climate condition earth because there is not significant changes in speed of Hurricanes, frequency of Hurricane occurring, and ice bergs melting speed. All these factors that are heavy dependent on the temperature condition are not getting influenced by less human activity during the pandemic. Additional, the correctional generated from ice melting speed and the strictness of law for lock down also reflect there is not relationship between climate conditions nd COVID19.
 
-The next steps in this analysis are collecting more useful data sets such as carbon emission level [^2] and earth temperature. By analyzing the relationship between COVID and these data set, we can get more significant insights about this topic.
+The next steps in this analysis are collecting more useful data sets such as carbon emission level and earth temperature. By analyzing the relationship between COVID and these data set, we can get more significant insights about this topic.
+
+[^3]: Carbon emission level is one of the important index that we need to investigate as well. From Emission Reductions From Pandemic Had Unexpected Effects on Atmosphere : NASA Jet Propulsion Laboratory (JPL), published on Nov. 9, 2021, URL: <https://www.jpl.nasa.gov/news/emission-reductions-from-pandemic-had-unexpected-effects-on-atmosphere/>
 
 **The limitations of this analysis are as follows.**
 
@@ -340,17 +344,7 @@ The next steps in this analysis are collecting more useful data sets such as car
 
 # References
 
-I am not strict about MLA or APA style or anything like that. For this report, I would much rather have your citations be easy to match to your insights.
-
 [^1]: This article leads us to investigate the impact of COVID19 towards climate change. Climate change indicators and impacts worsened in 2020: World Meteorological Organization, published on April. 19, 2021,  URL: https://wmo.int/news/media-centre/climate-change-indicators-and-impacts-worsened-2020
 
 [^2]: Carbon emission level is one of the important index that we need to investigate as well. From Emission Reductions From Pandemic Had Unexpected Effects on Atmosphere : NASA Jet Propulsion Laboratory (JPL), published on Nov. 9, 2021, URL: https://www.jpl.nasa.gov/news/emission-reductions-from-pandemic-had-unexpected-effects-on-atmosphere/
 
-[^3]: Original covid_2020 dataset. URL: https://covid.ourworldindata.org/
-
-[^4]: Original sea_ice_extent dataset.
-
-[^5]: Original cyclones_data dataset.
-
-
-make sure that you provide a sentence to describe the source and it's relevance when you cite it - don't just add citations to the end of a sentence (this is common practice in academia, but I want to know that your citations are directly relevant for this assignmnet).

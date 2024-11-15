@@ -13,7 +13,7 @@ List your group members, including their student numbers, here:
 -   David Zhao (169101599)
 -   Chee Kian Teoh (210984770)
 -   Harsahib Grewal (169089650)
--   Oluoma (169046829)
+-   Dumebi Nasa-Okolie (169046829)
 
 ```{r setup, include=FALSE}
 # echo = FALSE will set the Rmd to *not* show the R code. Don't change this.

@@ -3,6 +3,7 @@ title: "Is there a beneficial side of COVID?"
 author: "Chee Kian Teoh, David Zhao, Harsahib Grewal"
 date: "November 12th, 2024"
 output:
+  pdf_document: default
   html_document:
     df_print: paged
 ---
@@ -28,15 +29,15 @@ library(ggExtra)
 
 # Abstract
 
-General context, very brief data descriptions, techniques used, and general conclusions, all contained within a single, concise paragraph.
+We are interested in exploring how COVID-19 have impacted climate change by analyzing three datasets: `covid_2020_original.parquet` (COVID), `ice_extent_daily.parquet` (Ice Extent), and `cyclones_data.parquet` (Hurricane). To examine relationships among these datasets, we conduct statistical analyses (summary statistic) and implement data visualization (plotting graphs) to identify trends and possible correlations. Surprisingly, our findings indicate that COVID-19 did not alleviate climate conditions.
 
 # Introduction
 
-Climate change is a topic of extensive study and recently more challenges have arisen for environmental and public health, economic stability, and global ecosystems. As the climate continues to change because of natural events and human activities, the consequences are becoming more and more visible. The analysis looks at some of these impacts by getting data on natural events and public health and connecting them to see any emerging patterns that can lead to the answer of if they have any relation to the environmental change over recent decades.
+Climate change is a topic of extensive study and recently more challenges have arisen for environmental and public health, economic stability[], and global ecosystems[\^footnote]. As the climate continues to change because of natural events and human activities, the consequences are becoming more and more visible. The analysis looks at some of these impacts by getting data on natural events and public health and connecting them to see any emerging patterns that can lead to the answer of if they have any relation to the environmental change over recent decades.
 
-In this report, some key indicators of climate change versus global response factors are explored through exploratory analysis. The data-set we use look at the strength, and frequency of hurricanes in the Atlantic and North Pacific basins; polar ice extent in the Arctic and Antarctic regions; and COVID-19 reported cases around the world during the year 2020. Some techniques used in this analysis are data visualization and statistical explorations of any trends and possible correlations (whether high or low) within the data.
+In this report, some key indicators of climate change versus global response factors are explored through exploratory analysis. The dataset we use look at the strength, and frequency of hurricanes in the Atlantic and North Pacific basins; polar ice extent in the Arctic and Antarctic regions; and COVID-19 reported cases around the world during the year 2020. Some techniques used in this analysis are data visualization and statistical explorations of any trends and possible correlations (whether high or low) within the data.
 
-The goal of this analysis is to learn patterns in these data-sets and see the finer relation among these factors that may provide insight into what is affecting climate change. There are several limitations to the data here mainly around time and geographical locations, but this report still tries to show the relationships of climate events and their outcomes.
+The goal of this analysis is to learn patterns in these datasets and see the finer relation among these factors that may provide insight into what is affecting climate change. There are several limitations to the data here mainly around time and geographical locations, but this report still tries to show the relationships of climate events and their outcomes.
 
 By the end of this report, we will explain these correlations and provide a conclusion supported with evidence of the current impact of climate change.
 
@@ -54,10 +55,11 @@ cyclones_data <- cyclones_data_original |>
   mutate(AvgMaxWindPerYear = mean(max_wind, na.rm = TRUE)) |>
   select(Basin, ObservYear, AvgMaxWindPerYear) |>
   distinct() 
+
 cyclones_data
 ```
 
-The cyclones data-set shows data on hurricane activity across the Atlantic and North Pacific basins. Some important columns include cyclone strength (maximum wind speed, and category), cyclone duration, and basin of origin. More columns had similar attributes which were grouped such as geographical coordinates (latitude and longitude) of the cyclones at recorded times and dates of occurrence. This data-set allows us to analyze hurricane frequency, strength, and duration trends across different regions.
+The cyclones dataset shows data on hurricane activity across the Atlantic and North Pacific basins. Some important columns include cyclone strength (maximum wind speed, and category), cyclone duration, and basin of origin. More columns had similar attributes which were grouped such as geographical coordinates (latitude and longitude) of the cyclones at recorded times and dates of occurrence. This dataset allows us to analyze hurricane frequency, strength, and duration trends across different regions.
 
 In order to clean the data, we:
 
@@ -67,7 +69,7 @@ In order to clean the data, we:
 
 \- Remove any duplicate records based on unique cyclone identifiers.
 
-## \<\<COVID\>\>
+## \<\<Covid\>\>
 
 ```{r load_data2}
 # Put in your code to load in the data set, along with any
@@ -90,13 +92,13 @@ covid_2020 <- covid_2020_original |>
 covid_2020
 ```
 
-The COVID data-set reports total COVID-19 cases from 2020 to 2022 looking at most of the countries. Some important columns are the country name, total reported cases (new and old), deaths, population, and other demographic details relevant to the country's deaths to cases ratio. This data-set has a lot of empty data which would’ve proven useful to find some relations (ICU/hospital admissions and patients, COVID tests taken, and COVID vaccinations taken). Regardless of the missing material, this data-set allows us to explore the pandemic's global impact in 2020.
+The COVID dataset reports total COVID-19 cases from 2020 to 2024 looking at most of the countries. Some important columns are the country name, total reported cases (new and old), deaths, population, stringency index and other demographic details relevant to the country's deaths to cases ratio. This dataset has a lot of empty data which would've proven useful to find some relations (ICU/hospital admissions and patients, COVID tests taken, and COVID vaccinations taken). Regardless of the missing material, this dataset allows us to explore the pandemic's global impact in 2020.
 
 In order to clean the data, we:
 
 \- Remove all empty columns with missing data values
 
--   Remove records with missing or zero values in the total cases and population columns.
+\- Remove records with missing or zero values in the total cases and population columns.
 
 \- Standardize country names to ensure a common trend across the data set.
 
@@ -115,7 +117,7 @@ ice_extent_daily <- ice_extent_daily_original |>
 ice_extent_daily
 ```
 
-This data-set contains yearly data on ice extent in both the Arctic and Antarctic regions. Some important columns were year, region (Arctic or Antarctic), and ice extent measurements (km\^2). This data-set shows polar ice coverage which is a significant cause of climate change, and this allows us to see the trend analysis over time to see potential reductions in ice extent.
+This dataset contains yearly data on ice extent in both the Arctic and Antarctic regions. Some important columns were year, region (Arctic or Antarctic), and ice extent measurements (km\^2). This dataset shows polar ice coverage which is a significant cause of climate change, and this allows us to see the trend analysis over time to see potential reductions in ice extent.
 
 In order to clean the data, we:
 
@@ -127,19 +129,17 @@ In order to clean the data, we:
 
 ## Combining the Data
 
-For the combination of the ice_extent data-set and covid_2020 data-set we were interested in combining both tables by their date column so we can analyze and see the correlation between the melting ice and COVID-19 stringency (a measurement of how strict government policies were throughout the COVID-19 pandemic).
+For the combination of the ice_extent dataset and covid_2020 dataset we were interested in combining both tables by their "date" column so we can analyze and see the correlation between the melting ice and COVID-19 stringency index (a measurement of how strict government policies were throughout the COVID-19 pandemic).
 
-To achieve the combination we used "left_join" to combine the ice_extent data-set into the COVID_2020 data-set. The reasoning behind choosing to combine with a left_join is because the ice_extent data-set has a wider range of data collected going from 1980 to 2023 whereas covid_2020 only had data from 2020 to 2023. Because of this we wanted to combine according to the same year while showing data from previous year in the ice_extent data-set to reflect if there is a correlation between the two.
+To achieve the combination we used "left_join"[^4] to combine the ice_extent dataset into the COVID_2020 dataset. The reasoning behind choosing to combine with a left_join is because the ice_extent dataset has a wider range of data collected going from 1980 to 2023 whereas covid_2020 only had data from 2020 to 2024. Because of this we wanted to combine according to the same year while showing data from previous year in the ice_extent dataset to reflect if there is a correlation between the two.
 
 # Exploratory Data Analysis
-
-To achieve our goals, we explored the data by
 
 We explored many aspects of the data, but will demonstrate three. COVID did not contribute a significant change in \<\<the wind speed of hurricanes\>\>, \<\<The frequency and the type of hurricane occurring per year\>\>, and \<<ice melting speed per year>\>
 
 The first aspect that we found interesting is shown in \@ref(fig:insight1). The insight should be specific to the data shown, not a general statement beyond the data (leave that for the conclusion).
 
-```{r insight1, fig.cap="This is a figure caption that you will need to change in order to get good marks in the visualization rubric items."}
+```{r insight1, fig.cap="The trend of hurricane average max wind per year for both Atlantic and Eastern Pacific from 1990 to 2022"}
 # This is an example of how you can control figures and captions in
 # an R chunk. Note that you can reference figures using:
 # \@ref(fig:insight1), where "insight1" is the label of this code
@@ -150,10 +150,11 @@ cyclones_data |>
     aes(x = ObservYear, y = AvgMaxWindPerYear, colour = Basin) +
     geom_point() +
     geom_smooth(se = FALSE, method = 'loess', formula = 'y ~ x') +
-    xlim(1990, 2022)
+    xlim(1990, 2022) +
+    labs(x = "Observe Year", y = "Average Max Wind (knots)", title = "Hurricane Average Max Wind for Both Atlantic And Eastern Pacific", subtitle = "From 1990 To 2022")
 ```
 
-The data come from \<\<cyclones_data\>\> and describe the trend for different areas seems having complete opposite slope and it is not quite obvious to see a change between 2019 to 2023(starting and end time for COVID) for individual locations. Additionally, A big factor on speed and the frequecy of spearing is heavly depedent on the current temperature. If COVID reduce the temperature of Earth due to less human activity, there should be a difference in trend compare to the last 10 years. This shows that there is no significant effect in terms of hurricane speed.
+The data come from \<\<cyclones_data\>\> and describe the trend for Atlantic and Eastern Pacific from 1990 to 2022. They seem having complete opposite slope and it is not quite obvious to see a change between 2019 to 2023 (starting and end time for COVID) for individual locations. Additionally, A big factor on speed and the frequency of spearing is heavily dependent on the current temperature. If COVID indeed reduces the temperature of Earth due to less human activity, there should be a difference in trend compare to the last 10 years. This shows that there is no significant effect in terms of hurricane speed.
 
 This insight is supported by the summary statistics in table \@ref(tab:summary_stats)
 
@@ -164,8 +165,6 @@ This insight is supported by the summary statistics in table \@ref(tab:summary_s
 # ice_extent: date, region, ice_extent
 
 ice_extent_daily_original <- read_parquet("ice_extent_daily.parquet")
-
-
 
 ice_extent_daily <- ice_extent_daily_original |>
   pivot_wider(
@@ -203,55 +202,48 @@ monthly_ice_extent_and_stringency |>
       stringency_index_monthly_avg, 
       average_ice_melt, 
       use = "complete.obs"
-    ) , 3),
-    .groups = "drop" # This suppresses an annoying message
+    ) , 3)
   ) |>
   rename("correlation between average ice melting monthly and the strictness of COVID" = "correlation")
 
-# 2. Correlation graph
-# Pros: Simple, and clear for our purposes.
-# Cons: Repeated plot type, which might no be accepted
+# correlation graph
 cor_value <- cor(monthly_ice_extent_and_stringency$stringency_index_monthly_avg, 
                  monthly_ice_extent_and_stringency$average_ice_melt, 
                  use = "complete.obs") 
 
 p <- ggplot(monthly_ice_extent_and_stringency, aes(x = stringency_index_monthly_avg, y = average_ice_melt)) +
-  geom_point(alpha = 0.6) +  
-  geom_smooth(method = "lm", se = FALSE) + 
+  geom_point(alpha = 0.6, na.rm = TRUE) +  
+  geom_smooth(method = "lm", se = FALSE, na.rm = TRUE) + 
   labs(
     title = "Correlation between Monthly Average Ice Extent\n and COVID-19 Stringency Index over time",
     subtitle = str_c("Correlation Coefficient: ", round(cor_value, 3)),
     x = "COVID-19 Stringency Index",
     y = "Average Ice Extent (unit)"
   ) +
-  theme_minimal() 
+  theme_minimal()
 
-# Add a boxplot to the scatter plot
-ggMarginal(p, type = "boxplot")
+p
 
 # Finding: An increase in the average stringency index associates with very little or no increase of average ice extent.
 
 ```
 
-The summery statistic is the correlation coefficient between the strictness scale from law enforcement and the average ice melting area(km\^2) every month. This correlation is very weak. We can conclude that there is not correlation between the two variables. However, this might be caused by other factors. Maybe the effect from lock down would not occur immediately. To find out, lets make some plots according to time and analyse the trend.
+The summary statistic is the correlation coefficient between the COVID-19 stringency index (a measurement of how strict government policies were throughout the COVID-19 pandemic) and the average ice melting area(km\^2) every month. This correlation is very weak. We can conclude that there is not correlation between the two variables. However, this might be caused by other factors. Maybe the effect from lock down would not occur immediately. To find out, lets make some plots according to time and analyse the trend.
 
 The next insight that we found is shown in \@ref(fig:insight2).
 
-```{r insight2, fig.height=4, fig.width=6, fig.cap="This is a figure caption that you will need to change in order to get good marks in the visualization rubric items."}
+```{r insight2, fig.height=4, fig.width=6, fig.cap="The frequency of different hurricane categories in each year from 2014 to 2022. The hurricane categories represent by Saffir-Simpson scale <- reference? "}
 # This figure will have a height of 4 and a width of 6.
 # Feel free to change this, and to apply different sizes
 # to the other figures you create.
 
-# hurricane with facet
-
 # Put in your code to load in the data set, along with any
 # necessary cleaning beyond what was done in Part 1
 
-# Reminder: do not print your data to the screen unless it's
-# completely necessary
-# hurricane
+# Reminder: do not print your data to the screen unless it's completely necessary
 
-# facet by year
+
+# Hurricane facet by year
 # x = categories
 # y = frequencies (how many times each categories of hurricane happens in that year)
 cyclone_category_frequency_from_2015_to_2022 <- cyclones_data_original |>
@@ -259,6 +251,7 @@ cyclone_category_frequency_from_2015_to_2022 <- cyclones_data_original |>
   ggplot(aes(x = category)) +
   geom_bar() + 
   facet_wrap(~ObservYear)
+
 cyclone_category_frequency_from_2015_to_2022
 ```
 
@@ -266,7 +259,7 @@ The data come from \<\<cyclones_data_original\>\> and it is use the analyse the 
 
 Finally, \@ref(fig:insight3) shows ...
 
-```{r insight3, fig.height=5, fig.width=7, fig.cap="This is a figure caption that you will need to change in order to get good marks in the visualization rubric items."}
+```{r insight3, fig.height=5, fig.width=7, fig.cap="Normalized Ice Extent and COVID-19 Stringency Index from 2016 to 2023"}
 
 # Note: Please pick between one of the graph below:
 # 1. Normalized Ice Extent and COVID-19 Stringency Index (2016-2023)
@@ -301,9 +294,9 @@ monthly_ice_extent_and_stringency |>
   ) |>
   ggplot() +
   aes(x = date) +
-  geom_area(aes(y = normalized_stringency_index), fill="#69b3a2", alpha=0.4) +
-  geom_line(aes(y = normalized_stringency_index, color = "COVID-19 Stringency Index"), linewidth=0.5) +
-  geom_line(aes(y = normalized_ice_extent, color="Ice Extent"), linewidth=0.5) +
+  geom_area(aes(y = normalized_stringency_index), fill="#69b3a2", alpha=0.4, na.rm = TRUE) +
+  geom_line(aes(y = normalized_stringency_index, color = "COVID-19 Stringency Index"), linewidth=0.5, na.rm = TRUE) +
+  geom_line(aes(y = normalized_ice_extent, color="Ice Extent"), linewidth=0.5, na.rm = TRUE) +
   geom_vline(xintercept = as.numeric(year_lines), color = "black", linetype = "dashed", alpha=0.4) +
   scale_x_date(
     limits = as.Date(c("2016-01-01","2023-01-01")),
@@ -332,7 +325,7 @@ This graph is generated by combining information form ice extent and the strictn
 
 # Conclusion and Future Work
 
-Overall, we found \<<COVID-19 did not have significant drawback on global warming>\>.
+Overall, we found \<<COVID-19 did not have significant drawback on global warming>\>[\^].
 
 We found that COVID did not change the climate condition earth because there is not significant changes in speed of Hurricanes, frequency of Hurricane occurring, and ice bergs melting speed. All these factors that are heavy dependent on the temperature condition are not getting influenced by less human activity during the pandemic. Additional, the correctional generated from ice melting speed and the strictness of law for lock down also reflect there is not relationship between climate conditions nd COVID19.
 
@@ -348,10 +341,11 @@ I am not strict about MLA or APA style or anything like that. For this report, I
 
 The easiest way is to use Rmd's [footnote](https://bookdown.org/yihui/rmarkdown/markdown-syntax.html#inline-formatting) syntax. This will put a number beside the word where the footnote appears, and the full text of the footnote at the bottom of the page (pdf) or end of the document (html). The syntax is:[^1], where I suggest that you put in something like this[^2] to make references for this assignment.
 
-[^1]: See the source view to see this footnote
+[^1]: The relevance to the insight is ... . \
+    From Climate Change Indicators and Impacts Worsened 2020: World Meteorological Organization, published on 19 April 2021, URL: <https://wmo.int/news/media-centre/climate-change-indicators-and-impacts-worsened-2020>
 
 [^2]: The relevance to the insight is ... . From \<<name of source and name of article>\>, published on \<<date>\>, url: \<<link to page>\>
 
-Alternatively, you could make a list of citations with their main arguments and why they're relevent to your insights, methods, etc.
+[^4]: Learn about the concept of left join, right join and inner join. From Joining data frames with dplyr, url: https://lindsaydbrin.github.io/CREATE_R_Workshop/Lesson_-_dplyr_join.html
 
-The link above also references "bibtex" files. These are also extremely convenient, but have a steep learning curve and they make it difficult to tie them to an insight. If you use bibtext, then make sure that you provide a sentence to describe the source and it's relevance when you cite it - don't just add citations to the end of a sentence (this is common practice in academia, but I want to know that your citations are directly relevant for this assignmnet).
+make sure that you provide a sentence to describe the source and it's relevance when you cite it - don't just add citations to the end of a sentence (this is common practice in academia, but I want to know that your citations are directly relevant for this assignmnet).
